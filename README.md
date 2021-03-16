@@ -56,6 +56,8 @@ The 10.remove_quotation.rb script allows to remove quotation marks from big file
 
 <i>ruby 10. remove_quotation.rb input.txt > output.txt</i>
 
+Before next step, <b>the output file from mmseq2 pipeline has to be sort by coding_regions-contigs names</b>, to avoid problems with this pipeline.
+
 <i>ruby 11.kraken2_tax.rb kraken_out.txt > kraken_tax.txt</i>
 
 <i>ruby 12.diamond_tax.rb diamond_out.txt > diamond_tax.txt</i>
