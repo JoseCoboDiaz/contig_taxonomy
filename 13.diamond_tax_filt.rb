@@ -3,7 +3,7 @@
 
 name=''
 tax=[]
-problems=[]
+good=[]
 
 out=ARGV[0].gsub(".txt","")
 out1=File.new("#{out}_perfect.txt","w")
@@ -18,9 +18,12 @@ if line =~ /^(\S+)\_\d+\s+/
 	if $1 != name
 		if tax.uniq.length == 1
 		out1.puts "#{name}\t#{tax[0]}"
-		else
-		problems << name
-		puts name
+		good << name
+	 	else
+		tax.uniq.each {|x| if tax.count(x)*100/tax.length > 90	# this value can be changed to be more restrictive or less, as you prefer
+			out1.puts "#{name}\t#{x}"
+			good << name
+			end}
 		end
 	name = $1
 	tax = []		
@@ -32,12 +35,25 @@ end
 end
 aa.close
 
+### This part is to avoid lose the information of last contig
+	if tax.uniq.length == 1
+		out1.puts "#{name}\t#{tax[0]}"
+		good << name
+	 	else
+		tax.uniq.each {|x| if tax.count(x)*100/tax.length > 90
+			out1.puts "#{name}\t#{x}"
+			good << name
+			end}
+	end
+
+
+### This part is to write the output with contigs no taxnomically assigned, for further manual revision
 name=''
 
 bb=File.open(ARGV[0]).each_line do |line|
 line.chomp!
 if line =~ /^(\S+)\_\d+\s+/
-	if problems.include?($1)
+	if good.include?($1)==false
 		if $1 != name
 		name = $1
 		out2.puts "\n"
