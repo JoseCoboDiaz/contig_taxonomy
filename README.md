@@ -2,68 +2,66 @@ This is a pipeline to make the contigs taxonomic assignment by kraken2 (https://
 
 <b>Kraken2 pipeline</b>
 
-<i>kraken2 --db kraken2-microbial-fatfree/ contigs_ARGs.fna --threads 10 --report report_kraken2.txt --out out_kraken2.txt --memory-mapping</i>
+	kraken2 --db kraken2-microbial-fatfree/ contigs_ARGs.fna --threads 10 --report report_kraken2.txt --out out_kraken2.txt --memory-mapping
 
 being --threads the number of threads and the --memory-mapping command can be removed if the computeremployed for analyses has enough RAM memory to load the entire database (around 30 GB in our case).
 
 We are going to focus on bacterial contigs, so now we are going to download the bacterial database from RefSeq employed to built the kraken2-microbial database. The obtained .fna file to transform it to aminoacid database of the coding regions by prodigal (https://github.com/hyattpd/Prodigal):
 
-<i>kraken2 --download-library bacterial</i>
+	kraken2 --download-library bacterial
 
-<i>prodigal -a library_bact.faa -i library.fna -o library_bact_out.txt</i>
+	prodigal -a library_bact.faa -i library.fna -o library_bact_out.txt
 
 <b>Diamond pipeline</b>
 
 Moreover, the ncbi-taxdump folder, needed for mmseqs analysis (see below) contain the names.dmp file, which is going to be usefull to create the table of ID codes from kraken and their taxonomy assignment, by:
 
-<i>wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz</i>
+	wget ftp://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz
 
-<i>mkdir taxonomy && tar -xxvf taxdump.tar.gz -C taxonomy</i>
+	mkdir taxonomy && tar -xxvf taxdump.tar.gz -C taxonomy
 
-<i>ruby 00.extract_code_names.rb > code_names_kraken.txt</i>
+	ruby 00.extract_code_names.rb > code_names_kraken.txt
 
 The following comands are to extract coding regions from input .fna file (to .faa file), create the diamond format database of bacteria aminoacid database, and perform diamond analysis:
 
-<i>prodigal -a contigs_ARGs.faa -i contigs_ARGs2.fna </i>
+	prodigal -a contigs_ARGs.faa -i contigs_ARGs2.fna
 
-<i>diamond makedb --in library_bact.faa -d bacteria --threads 10</i>
+	diamond makedb --in library_bact.faa -d bacteria --threads 10
 
-<i>diamond blastp -q contigs_ARGs.faa -o diamond_contigsARGfaa.txt -p 10 -d kraken_bacteria.dmnd -f 6</i>
+	diamond blastp -q contigs_ARGs.faa -o diamond_contigsARGfaa.txt -p 10 -d kraken_bacteria.dmnd -f 6
 
-<i>ruby 01.take_first_hit.rb > diamond_firsthit.txt</i>
+	ruby 01.take_first_hit.rb > diamond_firsthit.txt
 
 <b>mmseqs2 pipeline</b>
 
-<i>conda activate mmseqs2</i>
+	conda activate mmseqs2
 
-<i>mmseqs createdb library.faa bactkrakDB</i>
+	mmseqs createdb library.faa bactkrakDB
 
-<i>ruby tax4mmseqs.rb > mapping_file.txt</i>
+	ruby tax4mmseqs.rb > mapping_file.txt
 
-<i>mmseqs createtaxdb bactkrakDB tmp --ncbi-tax-dump ncbi-taxdump –tax-mapping-file mapping_file.txt</i>
+	mmseqs createtaxdb bactkrakDB tmp --ncbi-tax-dump ncbi-taxdump –tax-mapping-file mapping_file.txt
 
-<i>conda activate mmseqs2</i>
+	mmseqs createdb contigs_ARGs.faa contigsDB
 
-<i>mmseqs createdb contigs_ARGs.faa contigsDB</i>
+	mmseqs taxonomy contigsDB mmseqs2/bactkrakDB mmseqs_contigs_tax tmp --tax-lineage 1
 
-<i>mmseqs taxonomy contigsDB mmseqs2/bactkrakDB mmseqs_contigs_tax tmp --tax-lineage 1</i>
-
-<i>mmseqs createtsv contigsDB mmseqs_contigs_tax mmseqs_contigs_table.txt</i>
+	mmseqs createtsv contigsDB mmseqs_contigs_tax mmseqs_contigs_table.txt
 
 <b>Add tax to ouputs and select taxonomy results</b>
 
 The 10.remove_quotation.rb script allows to remove quotation marks from big files, by
 
-<i>ruby 10. remove_quotation.rb input.txt > output.txt</i>
+	ruby 10. remove_quotation.rb input.txt > output.txt
 
 Before next step, <b>the output file from mmseq2 pipeline has to be sort by coding_regions-contigs names</b>, to avoid problems with this pipeline.
 
-<i>ruby 11.kraken2_tax.rb kraken_out.txt > kraken_tax.txt</i>
+	ruby 11.kraken2_tax.rb kraken_out.txt > kraken_tax.txt
 
-<i>ruby 12.diamond_tax.rb diamond_out.txt > diamond_tax.txt</i>
+	ruby 12.diamond_tax.rb diamond_out.txt > diamond_tax.txt
 
-<i>ruby 13.diamond_tax_filt.rb diamond_tax.txt > diamond_tax_filt.txt</i>
+	ruby 13.diamond_tax_filt.rb diamond_tax.txt > diamond_tax_filt.txt
 
-<i>ruby 14.mmseqs_tax_filt.rb mmseqs_tax.txt > mmseqs_tax_filt.txt</i>
+	ruby 14.mmseqs_tax_filt.rb mmseqs_tax.txt > mmseqs_tax_filt.txt
 
-<i>ruby 15.bind_tax.rb</i>
+	ruby 15.bind_tax.rb
