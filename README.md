@@ -1,3 +1,5 @@
+# contig_taxonomy
+
 This is a pipeline to make the contigs taxonomic assignment by kraken2 (https://github.com/DerrickWood/kraken2), mmseqs2 (https://github.com/soedinglab/MMseqs2) and diamond (https://github.com/bbuchfink/diamond) approaches using the same database, and finally select the genus level classification if at least 2 of the approaches have the same result. In this case, we have worked with the kraken2-microbial database (https://lomanlab.github.io/mockcommunity/mc_databases.html).
 
 <b>Kraken2 pipeline</b>
