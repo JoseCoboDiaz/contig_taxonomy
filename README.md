@@ -27,6 +27,7 @@ The following comands are to extract coding regions from input .fna file (to .fa
 	diamond makedb --in library_bact.faa -d bacteria --threads 10
 	diamond blastp -q contigs_ARGs.faa -o diamond_contigsARGfaa.txt -p 10 -d kraken_bacteria.dmnd -f 6
 	ruby 01.take_first_hit.rb > diamond_firsthit.txt
+ 	ruby 02.add_tax_diamond.rb
 
 <b>mmseqs2 pipeline</b>
 
