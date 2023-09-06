@@ -5,27 +5,27 @@ hmms={}
 hdiam={}
 
 
-cc=File.open("#{ARGV[0]}_mmseqs_perfect.txt").each_line do |line|
+cc=File.open("mmseqs_tax_filt.txt").each_line do |line|
 #97_NODE_4029	Rhizobacter
 line.chomp!
 hmms[line.split("\t")[0]]=line.split("\t")[1]
 end
 cc.close
 
-cc=File.open("#{ARGV[0]}_diamond_tax_perfect.txt").each_line do |line|	
+cc=File.open("diamond_tax_filt.txt").each_line do |line|	
 #97_NODE_4529	Aeromonas
 line.chomp!
 hdiam[line.split("\t")[0]]=line.split("\t")[1]
 end
 cc.close
 
-out=File.new("final_tax_#{ARGV[0]}.txt","w")
+out=File.new("final_tax.txt","w")
 out.puts "Contig\tKraken\tmmseqs\tdiamond\tconsensus"
 
 
 name=''
 tax=''
-cc=File.open("#{ARGV[0]}_krak_tax.txt").each_line do |line|	
+cc=File.open("kraken_tax.txt").each_line do |line|	
 #93_NODE_2925	2067572	1072	Pseudomonas
 line.chomp!
 name=line.split("\t")[0]
