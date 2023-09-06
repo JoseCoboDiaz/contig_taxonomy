@@ -33,7 +33,7 @@ The following comands are to extract coding regions from input .fna file (to .fa
 	conda activate mmseqs2
 	mmseqs createdb library.faa bactkrakDB
 	ruby tax4mmseqs.rb > mapping_file.txt
-	mmseqs createtaxdb bactkrakDB tmp --ncbi-tax-dump ncbi-taxdump –tax-mapping-file mapping_file.txt
+	mmseqs createtaxdb bactkrakDB tmp --ncbi-tax-dump ncbi-taxdump --tax-mapping-file mapping_file.txt
 	mmseqs createdb contigs_ARGs.faa contigsDB
 	mmseqs taxonomy contigsDB mmseqs2/bactkrakDB mmseqs_contigs_tax tmp --tax-lineage 1
 	mmseqs createtsv contigsDB mmseqs_contigs_tax mmseqs_contigs_table.txt
